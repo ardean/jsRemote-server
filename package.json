@@ -1,0 +1,38 @@
+{
+  "name": "jsremote-server",
+  "version": "0.1.0",
+  "description": "jsRemote Server",
+  "repository": "https://github.com/ardean/jsRemote-server",
+  "bugs": "https://github.com/ardean/jsRemote-server/issues",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "author": "ardean",
+  "license": "MIT",
+  "keywords": [
+    "mouse",
+    "keyboard",
+    "jsremote",
+    "jsremote-server",
+    "robotjs",
+    "remote",
+    "remote-mouse",
+    "remote-keyboard",
+    "remote-control"
+  ],
+  "scripts": {
+    "start": "ts-node ./demo",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@types/express": "^4.11.0",
+    "@types/node": "^9.3.0",
+    "@types/socket.io": "^1.4.31",
+    "express": "^4.16.2",
+    "robotjs": "^0.4.7",
+    "socket.io": "^2.0.4"
+  },
+  "devDependencies": {
+    "ts-node": "^4.1.0",
+    "typescript": "^2.6.2"
+  }
+}
