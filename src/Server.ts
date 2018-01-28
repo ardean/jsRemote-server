@@ -28,7 +28,7 @@ export default class RemoteJSServer extends EventEmitter {
     this.mouse = options.mouse || new Mouse(this.screen);
     this.keyboard = options.keyboard || new Keyboard();
     this.port = options.port || 4444;
-    this.webroot = options.webroot || "../client";
+    this.webroot = options.webroot;
     this.refreshInterval = options.refreshInterval || 10 * 1000;
   }
 
@@ -45,7 +45,7 @@ export default class RemoteJSServer extends EventEmitter {
 
     this.app = express();
     this.app.disable("x-powered-by");
-    this.app.use(express.static(path.join(__dirname, this.webroot)));
+    this.app.use(express.static(this.webroot || path.join(__dirname, "../client")));
 
     this.socket = this.app.listen(port, () => {
       this.startRefreshInterval();
