@@ -7,13 +7,12 @@ import Screen from "./Screen";
 import Mouse from "./Mouse";
 import Keyboard from "./Keyboard";
 import { Server } from "net";
-
-const bonjour = createBonjour();
-const bonjourNamespace = "io-github-ardean-jsremote";
+import * as os from "os";
 
 export default class JSRemoteServer extends EventEmitter {
   bonjour: boolean;
   bonjourService: any;
+  bonjourServiceName: string;
   refreshIntervalTimer: NodeJS.Timer = null;
   status: string = "Stopped";
   webroot: string;
@@ -38,6 +37,7 @@ export default class JSRemoteServer extends EventEmitter {
     this.webroot = options.webroot;
     this.refreshInterval = options.refreshInterval || 10 * 1000;
     this.bonjour = typeof options.bonjour === "boolean" ? options.bonjour : true;
+    this.bonjourServiceName = options.bonjourServiceName || `${os.hostname()} Remote`;
   }
 
   get running() {
@@ -57,7 +57,8 @@ export default class JSRemoteServer extends EventEmitter {
         this.startRefreshInterval();
         this.setStatus("Started");
         if (this.bonjour) {
-          this.bonjourService = bonjour.publish({ name: bonjourNamespace, type: "http", port: this.port });
+          const bonjour = createBonjour();
+          this.bonjourService = bonjour.publish({ name: this.bonjourServiceName, type: "jsremote", port: this.port });
         }
         this.emit("start");
         resolve();
