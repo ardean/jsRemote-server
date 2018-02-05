@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 import * as path from "path";
+import * as mdns from "mdns";
 import * as express from "express";
-import * as createBonjour from "bonjour";
 import * as createSocketIOServer from "socket.io";
 import Screen from "./Screen";
 import Mouse from "./Mouse";
@@ -10,9 +10,9 @@ import { Server } from "net";
 import * as os from "os";
 
 export default class JSRemoteServer extends EventEmitter {
-  bonjour: boolean;
-  bonjourService: any;
-  bonjourServiceName: string;
+  service: any;
+  serviceName: string;
+  broadcastService: boolean;
   refreshIntervalTimer: NodeJS.Timer = null;
   status: string = "Stopped";
   webroot: string;
@@ -36,8 +36,8 @@ export default class JSRemoteServer extends EventEmitter {
     this.port = options.port || 4444;
     this.webroot = options.webroot;
     this.refreshInterval = options.refreshInterval || 10 * 1000;
-    this.bonjour = typeof options.bonjour === "boolean" ? options.bonjour : true;
-    this.bonjourServiceName = options.bonjourServiceName || `${os.hostname()} Remote`;
+    this.broadcastService = typeof options.broadcastService === "boolean" ? options.broadcastService : true;
+    this.serviceName = options.serviceName || `${os.hostname()} Remote`;
   }
 
   get running() {
@@ -56,9 +56,9 @@ export default class JSRemoteServer extends EventEmitter {
       this.socket = this.app.listen(this.port, () => {
         this.startRefreshInterval();
         this.setStatus("Started");
-        if (this.bonjour) {
-          const bonjour = createBonjour();
-          this.bonjourService = bonjour.publish({ name: this.bonjourServiceName, type: "jsremote", port: this.port });
+        if (this.broadcastService) {
+          this.service = mdns.createAdvertisement(mdns.tcp("jsremote"), this.port, { name: this.serviceName });
+          this.service.start();
         }
         this.emit("start");
         resolve();
@@ -95,11 +95,9 @@ export default class JSRemoteServer extends EventEmitter {
       });
     });
 
-    if (this.bonjourService) {
-      await new Promise((resolve) => {
-        this.bonjourService.stop(() => resolve());
-      });
-      this.bonjourService = null;
+    if (this.service) {
+      this.service.stop();
+      this.service = null;
     }
   }
 
