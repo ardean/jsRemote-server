@@ -1,29 +1,29 @@
-import { EventEmitter } from "events";
+import * as os from "os";
 import * as path from "path";
-import * as mdns from "mdns";
 import * as express from "express";
+import { EventEmitter } from "events";
 import * as createSocketIOServer from "socket.io";
 import Screen from "./Screen";
 import Mouse from "./Mouse";
 import Keyboard from "./Keyboard";
 import { Server } from "net";
-import * as os from "os";
+import stw, { Service } from "spread-the-word";
 
 export default class JSRemoteServer extends EventEmitter {
-  service: any;
+  port: number;
+  refreshInterval: number;
+  service: Service;
   serviceName: string;
   broadcastService: boolean;
   refreshIntervalTimer: NodeJS.Timer = null;
   status: string = "Stopped";
   webroot: string;
   io: SocketIO.Namespace;
-  socket: Server;
   app: express.Application;
+  socket: Server;
   screen: Screen;
   mouse: Mouse;
   keyboard: Keyboard;
-  port: number;
-  refreshInterval: number;
 
   constructor(options?) {
     super();
@@ -37,7 +37,7 @@ export default class JSRemoteServer extends EventEmitter {
     this.webroot = options.webroot;
     this.refreshInterval = options.refreshInterval || 10 * 1000;
     this.broadcastService = typeof options.broadcastService === "boolean" ? options.broadcastService : true;
-    this.serviceName = options.serviceName || `${os.hostname()} Remote`;
+    this.serviceName = options.serviceName || `${os.userInfo().username}'s Remote Receiver`;
   }
 
   get running() {
@@ -53,12 +53,15 @@ export default class JSRemoteServer extends EventEmitter {
     this.app.use(express.static(this.webroot || path.join(__dirname, "../client")));
 
     const startPromise = new Promise((resolve) => {
-      this.socket = this.app.listen(this.port, () => {
+      this.socket = this.app.listen(this.port, async () => {
         this.startRefreshInterval();
         this.setStatus("Started");
         if (this.broadcastService) {
-          this.service = mdns.createAdvertisement(mdns.tcp("jsremote"), this.port, { name: this.serviceName });
-          this.service.start();
+          this.service = await stw.spread({
+            type: "jsremote",
+            name: this.serviceName,
+            port: this.port
+          });
         }
         this.emit("start");
         resolve();
@@ -96,7 +99,7 @@ export default class JSRemoteServer extends EventEmitter {
     });
 
     if (this.service) {
-      this.service.stop();
+      this.service.destroy();
       this.service = null;
     }
   }
