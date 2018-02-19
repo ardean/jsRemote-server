@@ -1,6 +1,6 @@
 {
   "name": "jsremote-server",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "jsRemote Server",
   "repository": "https://github.com/ardean/jsRemote-server",
   "bugs": "https://github.com/ardean/jsRemote-server/issues",
@@ -30,7 +30,7 @@
     "express": "^4.16.2",
     "robotjs": "^0.4.7",
     "socket.io": "^2.0.4",
-    "spread-the-word": "^0.1.1"
+    "spread-the-word": "^0.3.0"
   },
   "devDependencies": {
     "ts-node": "^4.1.0",

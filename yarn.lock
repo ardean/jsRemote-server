@@ -833,9 +833,9 @@ source-map@^0.6.0:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
 
-spread-the-word@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/spread-the-word/-/spread-the-word-0.1.1.tgz#8afffdcd0b42cb3c99d53e49f84abf2241f74f28"
+spread-the-word@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/spread-the-word/-/spread-the-word-0.3.0.tgz#519fc723c915673568b057f7e050221d36629bba"
   dependencies:
     "@types/node" "^9.4.1"
     debug "^3.1.0"
